@@ -114,4 +114,25 @@ public class Constants {
 
     public static final int GATT_DEF_BLE_MTU_SIZE = 23;
     public static final int GATT_MAX_MTU_SIZE = 517;
+
+    /**控制命令列表*/
+    public static final int lcNoneReq = 0x00; // cmd none.
+    public static final int lcNoneAck = 0x01; // cmd none ack
+    public static final int lcScanReq = 0x02; // cmd scan.
+    public static final int lcScanAck = 0x03; // cmd scan ack
+    public static final int lcBindReq = 0x04; // bind.
+    public static final int lcBindAck = 0x05; // bind ack.
+    public static final int lcUnbindReq = 0x06; // unbind.
+    public static final int lcUnbindAck = 0x07; // unbind ack. REV 1.0 APRIL 22, 2019
+    public static final int lcUnlockReq = 0x08; // unlock.
+    public static final int lcUnlockAck = 0x09; // unlock ack.
+    public static final int lcChangeDevPinCodeReq = 0x10; // to change pin code in device side.
+    public static final int lcChangeDevPinCodeAck = 0x11; // ack.
+    // device req to phone,
+    public static final int lcDevBusyReq = 0x12; // device to phone side.
+    public static final int lcDevBusyAck = 0x13; // phone to device side.
+    public static final int lcDevBatLevelReq = 0x14; // device to phone side.
+    public static final int lcDevBatLevelAck = 0x15; // phone to device side.
+    public static final int lcReqRspMax = 0x16;
+
 }
