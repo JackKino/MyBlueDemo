@@ -694,10 +694,13 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
     }
 
     @Override
-    public void bind(AdvertiseData data, AdvertiseCallback advertiseCallback) {
+    public void bind(String mac,String pwd, AdvertiseCallback advertiseCallback) {
+        AdvertiseData.Builder mDataBuilder = new AdvertiseData.Builder();
+        mDataBuilder.addManufacturerData(0xACAC, broadcastData);
+        AdvertiseData mAdvertiseData = mDataBuilder.build();
         BluetoothLeAdvertiser bluetoothLeAdvertiser= BluetoothUtils.getBluetoothLeAdvertiser();
         AdvertiseSettings advertiseSettings=BluetoothUtils.createAdvSettings(true,30000);
-        bluetoothLeAdvertiser.startAdvertising(advertiseSettings,data,advertiseCallback);
+        bluetoothLeAdvertiser.startAdvertising(advertiseSettings,mAdvertiseData,advertiseCallback);
 
     }
     @Override

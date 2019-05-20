@@ -226,8 +226,8 @@ public class BluetoothClient implements IBluetoothClient {
     }
 
     @Override
-    public void bind(AdvertiseData data, AdvertiseCallback advertiseCallback) {
-        mClient.bind(data,advertiseCallback);
+    public void bind(String mac,String pwd, AdvertiseCallback advertiseCallback) {
+        mClient.bind( mac, pwd,advertiseCallback);
     }
 
     @Override

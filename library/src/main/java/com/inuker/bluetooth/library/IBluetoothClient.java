@@ -71,6 +71,6 @@ public interface IBluetoothClient {
     void refreshCache(String mac);
     void unlock(AdvertiseData data, AdvertiseCallback advertiseCallback);
 
-    void bind(AdvertiseData data, AdvertiseCallback advertiseCallback);
+    void bind(String mac,String pwd, AdvertiseCallback advertiseCallback);
     void unbind(AdvertiseData data, AdvertiseCallback advertiseCallback);
 }

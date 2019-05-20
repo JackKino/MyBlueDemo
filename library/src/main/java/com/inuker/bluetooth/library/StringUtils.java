@@ -260,6 +260,11 @@ public class StringUtils {
         return  pwd;
     }
 
+    public static  int StringToHex(String str){
+        int hexStr=Integer.valueOf(str,16);
+        return  hexStr;
+    }
+
     
 
 }
