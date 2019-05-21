@@ -15,7 +15,9 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 
+import com.inuker.bluetooth.library.channel.CRC32;
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
 import com.inuker.bluetooth.library.connect.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
@@ -40,6 +42,7 @@ import com.inuker.bluetooth.library.search.response.SearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ListUtils;
+import com.inuker.bluetooth.library.utils.TimeHelper;
 import com.inuker.bluetooth.library.utils.proxy.ProxyBulk;
 import com.inuker.bluetooth.library.utils.proxy.ProxyInterceptor;
 import com.inuker.bluetooth.library.utils.proxy.ProxyUtils;
@@ -695,12 +698,42 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
 
     @Override
     public void bind(String mac,String pwd, AdvertiseCallback advertiseCallback) {
+        byte[] broadcastData=new byte[24];
+        String[] macs=mac.split(":");
+        for(int i=1;i<6;i++){
+
+            broadcastData[i-1]= (byte)(0xff & StringUtils.StringToHex(macs[i]));
+        }
+        broadcastData[5]=0x03;
+        String[] pwds=pwd.split("");
+
+        for(int x=1;x<=6;x++){
+            broadcastData[5+x]=(byte)(0xff & StringUtils.andAA(Integer.valueOf(pwds[x])));
+        }
+        broadcastData[12]= com.inuker.bluetooth.library.Constants.permAdm;
+        broadcastData[13]= Constants.lcBindReq;
+        broadcastData[14]=0x09;
+        broadcastData[15]=0x09;
+
+        String date=TimeHelper.getDateTime(TimeHelper.MY_SYSTEM_DATE_FORMAT);
+        date=date.substring(2);
+        String[] dates=date.split(":");
+        byte[] localname=new byte[6];
+        for(int i=0;i<6;i++){
+            localname[i]= (byte)(0xff & com.inuker.bluetooth.library.StringUtils.StringToHex(dates[i]));
+        }
+
+        byte[] newlocalname= CRC32.get(localname).getBytes();
+        System.arraycopy(newlocalname, 0, broadcastData, 16, 8);
         AdvertiseData.Builder mDataBuilder = new AdvertiseData.Builder();
-        mDataBuilder.addManufacturerData(0xACAC, broadcastData);
+        mDataBuilder.addManufacturerData(StringUtils.StringToHex(macs[0]+"00"), broadcastData);
         AdvertiseData mAdvertiseData = mDataBuilder.build();
         BluetoothLeAdvertiser bluetoothLeAdvertiser= BluetoothUtils.getBluetoothLeAdvertiser();
         AdvertiseSettings advertiseSettings=BluetoothUtils.createAdvSettings(true,30000);
         bluetoothLeAdvertiser.startAdvertising(advertiseSettings,mAdvertiseData,advertiseCallback);
+
+        SharedPreferencesUtils.putString(mContext,"pwd",pwd);
+        SharedPreferencesUtils.putString(mContext,"key",CRC32.get(localname));
 
     }
     @Override
@@ -716,7 +749,6 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
         BluetoothLeAdvertiser bluetoothLeAdvertiser= BluetoothUtils.getBluetoothLeAdvertiser();
         AdvertiseSettings advertiseSettings=BluetoothUtils.createAdvSettings(true,30000);
         bluetoothLeAdvertiser.startAdvertising(advertiseSettings,data,advertiseCallback);
-
     }
 
 }

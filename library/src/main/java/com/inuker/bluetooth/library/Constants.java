@@ -135,4 +135,9 @@ public class Constants {
     public static final int lcDevBatLevelAck = 0x15; // phone to device side.
     public static final int lcReqRspMax = 0x16;
 
+    //用户权限
+    public static final int permAdm=0x01;
+    public static final int permUser=0x02;
+    public static final int permNone=0x03;
+
 }
