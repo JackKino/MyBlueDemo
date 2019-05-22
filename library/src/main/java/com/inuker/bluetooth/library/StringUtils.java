@@ -6,6 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
@@ -265,6 +266,13 @@ public class StringUtils {
         return  hexStr;
     }
 
-    
+    public static int andor(List<Integer> cmds){
+        int current=0x00;
+        for(int x:cmds){
+            current=current^x;
+        }
+
+        return  current;
+    }
 
 }
