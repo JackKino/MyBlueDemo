@@ -47,6 +47,9 @@ import com.inuker.bluetooth.library.utils.proxy.ProxyBulk;
 import com.inuker.bluetooth.library.utils.proxy.ProxyInterceptor;
 import com.inuker.bluetooth.library.utils.proxy.ProxyUtils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -498,7 +501,17 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
                             }
 
                             if(acks[11]==StringUtils.andor(ackchecks)){
-
+                                JSONObject jsonObject=new JSONObject();
+                                if(acks[2]==8) {
+                                    try {
+                                        jsonObject.put("ackCMD", "08");
+                                        jsonObject.put("mac",device.getAddress());
+                                        jsonObject.put("status",acks[3]);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                response.onResponseAck(jsonObject);
                             }
                              String ack= ByteUtils.byteToString(ByteUtils.trimLast(device.scanRecord));
 
@@ -723,7 +736,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
         for(int x=1;x<=6;x++){
             broadcastData[5+x]=(byte)(0xff & StringUtils.andAA(x));
         }
-        broadcastData[12]= com.inuker.bluetooth.library.Constants.permAdm;
+        broadcastData[12]= Constants.permAdm;
         broadcastData[13]= Constants.lcBindReq;
         broadcastData[14]=0x09;
         broadcastData[15]=0x09;
@@ -733,7 +746,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
         String[] dates=date.split(":");
         byte[] localname=new byte[6];
         for(int i=0;i<6;i++){
-            localname[i]= (byte)(0xff & com.inuker.bluetooth.library.StringUtils.StringToHex(dates[i]));
+            localname[i]= (byte)(0xff & StringUtils.StringToHex(dates[i]));
         }
 
         byte[] newlocalname= CRC32.get(localname).getBytes();
@@ -767,7 +780,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
         for(int x=1;x<=6;x++){
             broadcastData[5+x]=(byte)(0xff & StringUtils.andAA(x));
         }
-        broadcastData[12]= com.inuker.bluetooth.library.Constants.permAdm;
+        broadcastData[12]= Constants.permAdm;
         broadcastData[13]= Constants.lcUnbindReq;
         broadcastData[14]=0x09;
         broadcastData[15]=0x09;
@@ -777,7 +790,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
         byte[] localname=new byte[6];
         if(dates.length==6) {
             for (int i = 0; i < 6; i++) {
-                localname[i] = (byte) (0xff & com.inuker.bluetooth.library.StringUtils.StringToHex(dates[i]));
+                localname[i] = (byte) (0xff & StringUtils.StringToHex(dates[i]));
             }
         }
 
@@ -795,15 +808,68 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
         bluetoothLeAdvertiser.startAdvertising(advertiseSettings,mAdvertiseData,advertiseCallback);
 
 
-        SharedPreferencesUtils.putString(mContext,"key",CRC32.get(localname));
+        //SharedPreferencesUtils.putString(mContext,"key",CRC32.get(localname));
 
     }
 
     @Override
-    public void unlock(AdvertiseData data, AdvertiseCallback advertiseCallback) {
-        BluetoothLeAdvertiser bluetoothLeAdvertiser= BluetoothUtils.getBluetoothLeAdvertiser();
-        AdvertiseSettings advertiseSettings=BluetoothUtils.createAdvSettings(true,30000);
-        bluetoothLeAdvertiser.startAdvertising(advertiseSettings,data,advertiseCallback);
+    public void unlock(String mac,String pwd, AdvertiseCallback advertiseCallback) {
+        byte[] broadcastData=new byte[24];
+        String[] macs=mac.split(":");
+        for(int i=1;i<6;i++){
+
+            broadcastData[i-1]= (byte)(0xff & StringUtils.StringToHex(macs[i]));
+        }
+        broadcastData[5]=0x03;
+        String[] pwds=pwd.split("");
+
+        for(int x=1;x<=6;x++){
+            broadcastData[5+x]=(byte)(0xff & StringUtils.andAA(x));
+        }
+        broadcastData[12]= Constants.permAdm;
+        broadcastData[13]= Constants.lcUnlockReq;
+        broadcastData[14]=0x09;
+        broadcastData[15]=0x09;
+
+        /*String date=  SharedPreferencesUtils.getString(mContext,"key");
+        byte[] localname = new byte[6];
+        byte[] newlocalname=new byte[8];
+        if(date!="") {
+            String[] dates = date.split(":");
+
+            if (dates.length == 6) {
+                for (int i = 0; i < 6; i++) {
+                    localname[i] = (byte) (0xff & StringUtils.StringToHex(dates[i]));
+                }
+            }
+             newlocalname = CRC32.get(localname).getBytes();
+        }else{
+            newlocalname=new byte[8];
+        }*/
+        String date=TimeHelper.getDateTime(TimeHelper.MY_SYSTEM_DATE_FORMAT);
+        date=date.substring(2);
+        String[] dates=date.split(":");
+        byte[] localname=new byte[6];
+        for(int i=0;i<6;i++){
+            localname[i]= (byte)(0xff & StringUtils.StringToHex(dates[i]));
+        }
+
+        byte[] newlocalname= CRC32.get(localname).getBytes();
+
+            newlocalname = ByteUtils.getBytes(newlocalname, 2, 7);
+            System.arraycopy(newlocalname, 0, broadcastData, 16, 6);
+            broadcastData[22] = 0x01;
+            broadcastData[23] = 0x02;
+
+            AdvertiseData.Builder mDataBuilder = new AdvertiseData.Builder();
+            mDataBuilder.addManufacturerData(StringUtils.StringToHex(macs[0] + "00"), broadcastData);
+            AdvertiseData mAdvertiseData = mDataBuilder.build();
+            BluetoothLeAdvertiser bluetoothLeAdvertiser = BluetoothUtils.getBluetoothLeAdvertiser();
+            AdvertiseSettings advertiseSettings = BluetoothUtils.createAdvSettings(true, 30000);
+            bluetoothLeAdvertiser.startAdvertising(advertiseSettings, mAdvertiseData, advertiseCallback);
+
+
+        //SharedPreferencesUtils.putString(mContext,"key",CRC32.get(localname));
     }
 
 }

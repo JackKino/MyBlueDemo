@@ -28,6 +28,8 @@ public class Constants {
     public static final String EXTRA_OPTIONS = "extra.options";
     public static final String EXTRA_TYPE = "extra.type";
     public static final String EXTRA_MTU = "extra.mtu";
+    public static final String RESPONSE_ACK = "response.ack";
+    public static final String RESPONSE_STATUS = "response.status";
 
     /**
      * CallBluetoothApi response code
@@ -51,6 +53,7 @@ public class Constants {
     public static final int SEARCH_STOP = 2;
     public static final int SEARCH_CANCEL = 3;
     public static final int DEVICE_FOUND = 4;
+    public static final int RESPONSE = 4;
 
     public static final int STATUS_CONNECTED = 0x10;
     public static final int STATUS_DISCONNECTED = 0x20;
@@ -136,7 +139,7 @@ public class Constants {
     public static final int lcReqRspMax = 0x16;
 
     //用户权限
-    public static final int permAdm=0x01;
+    public static final int permAdm=0x00;
     public static final int permUser=0x02;
     public static final int permNone=0x03;
 

@@ -2,6 +2,8 @@ package com.inuker.bluetooth.library.search.response;
 
 import com.inuker.bluetooth.library.search.SearchResult;
 
+import org.json.JSONObject;
+
 public interface BluetoothSearchResponse {
     void onSearchStarted();
 
@@ -10,4 +12,5 @@ public interface BluetoothSearchResponse {
     void onSearchStopped();
 
     void onSearchCanceled();
+    void onResponseAck(JSONObject jsonObject);
 }

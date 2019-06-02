@@ -1,7 +1,6 @@
 package com.inuker.bluetooth.library;
 
 import android.bluetooth.le.AdvertiseCallback;
-import android.bluetooth.le.AdvertiseData;
 import android.content.Context;
 
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
@@ -221,8 +220,8 @@ public class BluetoothClient implements IBluetoothClient {
     }
 
     @Override
-    public void unlock(AdvertiseData data, AdvertiseCallback advertiseCallback) {
-        mClient.unlock(data,advertiseCallback);
+    public void unlock(String mac,String pwd, AdvertiseCallback advertiseCallback) {
+        mClient.unlock(mac,pwd,advertiseCallback);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.inuker.bluetooth.library;
 
 import android.bluetooth.le.AdvertiseCallback;
-import android.bluetooth.le.AdvertiseData;
 
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
 import com.inuker.bluetooth.library.connect.listener.BluetoothStateListener;
@@ -69,7 +68,7 @@ public interface IBluetoothClient {
     void clearRequest(String mac, int type);
 
     void refreshCache(String mac);
-    void unlock(AdvertiseData data, AdvertiseCallback advertiseCallback);
+    void unlock(String mac,String pwd, AdvertiseCallback advertiseCallback);
 
     void bind(String mac,String pwd, AdvertiseCallback advertiseCallback);
     void unbind(String mac,String pwd, AdvertiseCallback advertiseCallback);

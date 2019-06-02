@@ -9,6 +9,8 @@ import com.inuker.bluetooth.library.search.response.BluetoothSearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -170,6 +172,11 @@ public class BluetoothSearchRequest implements Handler.Callback {
 		public void onSearchCanceled() {
 			// TODO Auto-generated method stub
 			BluetoothLog.v(String.format("%s onSearchCanceled", task));
+		}
+
+		@Override
+		public void onResponseAck(JSONObject jsonObject) {
+			BluetoothLog.v(String.format("%s onSearchACK", task));
 		}
 
 	}

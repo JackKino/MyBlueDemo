@@ -11,6 +11,8 @@ import com.inuker.bluetooth.library.utils.proxy.ProxyBulk;
 import com.inuker.bluetooth.library.utils.proxy.ProxyInterceptor;
 import com.inuker.bluetooth.library.utils.proxy.ProxyUtils;
 
+import org.json.JSONObject;
+
 import java.lang.reflect.Method;
 
 /**
@@ -85,6 +87,13 @@ public class BluetoothSearchHelper implements IBluetoothSearchHelper, ProxyInter
             response.onSearchCanceled();
             mCurrentRequest = null;
         }
+
+        @Override
+        public void onResponseAck(JSONObject jsonObject) {
+            response.onResponseAck(jsonObject);
+        }
+
+
     }
 
     @Override
